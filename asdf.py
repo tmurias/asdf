@@ -47,7 +47,9 @@ def main():
             error("usage - asdf open <name>")
         shortcut_arg = sys.argv[2].strip()
         validate_shortcut_name(shortcut_arg)
-        asdf_open(shortcut_arg)
+        output = asdf_open(shortcut_arg)
+        if output:
+            print(output)
     elif asdf_arg == "add":
         # asdf add <name> <path>
         if len(sys.argv) != 4:
@@ -55,31 +57,41 @@ def main():
         shortcut_arg = sys.argv[2].strip()
         validate_shortcut_name(shortcut_arg)
         path_arg = sys.argv[3].strip()
-        asdf_add(shortcut_arg, path_arg)
+        output = asdf_add(shortcut_arg, path_arg)
+        if output:
+            print(output)
     elif asdf_arg == "list":
         # asdf list
         if len(sys.argv) != 2:
             error("too many arguments")
-        asdf_list()
+        output = asdf_list()
+        if output:
+            print(output)
     elif asdf_arg == "delete":
         # asdf delete <name>
         if len(sys.argv) != 3:
             error("usage - asdf open <name>")
         shortcut_arg = sys.argv[2].strip()
         validate_shortcut_name(shortcut_arg)
-        asdf_delete(shortcut_arg)
+        output = asdf_delete(shortcut_arg)
+        if output:
+            print(output)
     elif asdf_arg == "master":
         # asdf master (manually edit the shortcut file)
         if len(sys.argv) != 2:
             error("too many arguments")
-        asdf_master()
+        output = asdf_master()
+        if output:
+            print(output)
     elif asdf_arg == "dir":
         # asdf dir <name>
         if len(sys.argv) != 3:
             error("usage - asdf dir <name>")
         shortcut_arg = sys.argv[2].strip()
         validate_shortcut_name(shortcut_arg)
-        asdf_dir(shortcut_arg)
+        output = asdf_dir(shortcut_arg)
+        if output:
+            print(output)
     elif asdf_arg == "help":
         # asdf help
         print("asdf usage:")
@@ -111,8 +123,7 @@ def validate_shortcut_name(sc_name):
 
 def asdf_open(shortcut_name):
     if not os.path.exists(SCF_FILENAME):
-        print("Shortcut " + shortcut_name + " does not exist")
-        return
+        return "Shortcut " + shortcut_name + " does not exist"
     shortcuts = csv_to_dict(SCF_FILENAME)
     if shortcut_name not in shortcuts:
         error("shortcut doesn't exist: " + shortcut_name)
@@ -134,19 +145,20 @@ def asdf_add(shortcut_name, shortcut_path):
     # Write (or update) the entry in the shortcuts file
     shortcuts = csv_to_dict(SCF_FILENAME)
     if shortcut_name in shortcuts:
-        print("Updating " + shortcut_name)
+        output = "Updating " + shortcut_name
     else:
-        print("Adding shortcut " + shortcut_name)
+        output = "Adding shortcut " + shortcut_name
     shortcuts[shortcut_name] = shortcut_path
     dict_to_csv(shortcuts, SCF_FILENAME)
+    return output
 
 
 def asdf_list():
     if os.path.exists(SCF_FILENAME):
         shortcuts = csv_to_dict(SCF_FILENAME)
-        display_shortcuts(shortcuts)
+        return get_shortcut_list(shortcuts)
     else:
-        print("No shortcuts")
+        return "No shortcuts"
 
 
 def asdf_delete(shortcut_name):
@@ -155,11 +167,11 @@ def asdf_delete(shortcut_name):
         if shortcut_name in shortcuts:
             del shortcuts[shortcut_name]
             dict_to_csv(shortcuts, SCF_FILENAME)
-            print("Deleted shortcut " + shortcut_name)
+            return "Deleted shortcut " + shortcut_name
         else:
-            print("Shortcut " + shortcut_name + " does not exist")
+            return "Shortcut " + shortcut_name + " does not exist"
     else:
-        print("Shortcut " + shortcut_name + " does not exist")
+        return "Shortcut " + shortcut_name + " does not exist"
 
 
 def asdf_master():
@@ -170,11 +182,11 @@ def asdf_dir(shortcut_name):
     if os.path.exists(SCF_FILENAME):
         shortcuts = csv_to_dict(SCF_FILENAME)
         if shortcut_name in shortcuts:
-            print(shortcuts[shortcut_name])
+            return shortcuts[shortcut_name]
         else:
-            print("Shortcut " + shortcut_name + " does not exist")
+            return "Shortcut " + shortcut_name + " does not exist"
     else:
-        print("Shortcut " + shortcut_name + " does not exist")
+        return "Shortcut " + shortcut_name + " does not exist"
 
 
 def open_shortcut(scdir):
@@ -204,9 +216,11 @@ def dict_to_csv(shortcuts, filename):
             csv_file.write(sc_name + "," + sc_path + "\n")
 
 
-def display_shortcuts(shortcut_dict):
+def get_shortcut_list(shortcut_dict):
+    ls = []
     for sc in sorted(shortcut_dict):
-        print(sc + " -> " + shortcut_dict[sc])
+        ls.append(sc + " -> " + shortcut_dict[sc])
+    return "\n".join(ls)
 
 
 def error(msg):
