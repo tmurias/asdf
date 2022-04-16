@@ -45,17 +45,34 @@ def main():
         if len(sys.argv) != 2:
             error("too many arguments")
         asdf_master()
+    elif asdf_arg == "dir":
+        # asdf dir <name>
+        if len(sys.argv) != 3:
+            error("usage - asdf dir <name>")
+        shortcut_arg = sys.argv[2].strip()
+        validate_shortcut_name(shortcut_arg)
+        asdf_dir(shortcut_arg)
     elif asdf_arg == "help":
         # asdf help
         print("asdf usage:")
         print("  asdf list")
         print("  asdf add <name> <path>")
         print("  asdf open <name>")
+        print("  asdf dir <name>")
         print("  asdf delete <name>")
         print("  asdf master")
         print("  asdf help")
     else:
-        error("second arg must be open, add, list, delete, master, or help")
+        err_msg = []
+        err_msg.append("second arg must be one of the following:")
+        err_msg.append("  list")
+        err_msg.append("  add")
+        err_msg.append("  open")
+        err_msg.append("  dir")
+        err_msg.append("  delete")
+        err_msg.append("  master")
+        err_msg.append("  help")
+        error("\n".join(err_msg))
 
 
 def validate_shortcut_name(sc_name):
@@ -119,6 +136,17 @@ def asdf_delete(shortcut_name):
 
 def asdf_master():
     subprocess.call(['vi', SCF_FILENAME])
+
+
+def asdf_dir(shortcut_name):
+    if os.path.exists(SCF_FILENAME):
+        shortcuts = csv_to_dict(SCF_FILENAME)
+        if shortcut_name in shortcuts:
+            print(shortcuts[shortcut_name])
+        else:
+            print("Shortcut " + shortcut_name + " does not exist")
+    else:
+        print("Shortcut " + shortcut_name + " does not exist")
 
 
 def open_shortcut(scdir):
