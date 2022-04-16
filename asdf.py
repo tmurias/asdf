@@ -1,4 +1,32 @@
 #! /usr/bin/env python3
+"""
+Tool for mapping shortcuts to directories.
+
+Add shortcuts:
+    $ asdf add project1 ~/projects/somewhere/somewhereelse/project1
+    Adding shortcut project1
+    $ asdf add project2 ~/projects/project2/p2
+    Adding shortcut project2
+
+View all shortcuts:
+    $ asdf list
+    project1 -> ~/projects/somewhere/somewhereelse/project1
+    project2 -> ~/projects/project2/p2
+
+Get directory for specific shortcut:
+    $ asdf dir project2
+    ~/projects/project2/p2
+
+Open shortcut directory in new terminal:
+    $ asdf open project2
+
+Delete shortcut:
+    $ asdf delete project1
+    Deleted shortcut project1
+
+Edit the shortcut file manually:
+    $ asdf master
+"""
 import os
 from pathlib import Path
 import subprocess
